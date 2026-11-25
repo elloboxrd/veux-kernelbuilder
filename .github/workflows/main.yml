@@ -25,16 +25,24 @@ jobs:
       - name: Build kernel preparation
         run: ./build.sh startbuild
 
+
       - name: Download RTL8188EUS
         run: |
           git clone --depth 1 -b v5.3.9 \
             https://github.com/aircrack-ng/rtl8188eus.git
+
+      - name: Prepare kernel configuration
+        run: |
+          make -C common O="$GITHUB_WORKSPACE/out/android11-5.4" ARCH=arm64 qgki_defconfig
+          make -C common O="$GITHUB_WORKSPACE/out/android11-5.4" ARCH=arm64 oldconfig </dev/null
+          make -C common O="$GITHUB_WORKSPACE/out/android11-5.4" ARCH=arm64 modules_prepare
 
       - name: Compile RTL8188EUS
         run: |
           export PATH="$GITHUB_WORKSPACE/clang/bin:$GITHUB_WORKSPACE/gcc/bin:$PATH"
           export CC=clang
           export LD=ld.lld
+
 
           cd rtl8188eus
           sed -i 's/CONFIG_PLATFORM_I386_PC = y/CONFIG_PLATFORM_I386_PC = n/' Makefile
