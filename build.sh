@@ -23,7 +23,7 @@ getsource () {
     echo ============================
     echo Downloading kernel source...
     set -x
-    git clone --depth=1 $KERNEL_SOURCE $KBRANCH common
+    git clone --depth=1 $KBRANCH $KERNEL_SOURCE common
     set +x
     fi
 }
