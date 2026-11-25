@@ -31,11 +31,31 @@ jobs:
           git clone --depth 1 -b v5.3.9 \
             https://github.com/aircrack-ng/rtl8188eus.git
 
+      
       - name: Prepare kernel configuration
         run: |
+          export PATH="$GITHUB_WORKSPACE/clang/bin:$GITHUB_WORKSPACE/gcc/bin:$PATH"
+          export ARCH=arm64
+          export CC=clang
+          export LD=ld.lld
+          export AR=llvm-ar
+          export NM=llvm-nm
+          export OBJCOPY=llvm-objcopy
+          export OBJDUMP=llvm-objdump
+          export STRIP=llvm-strip
+
           make -C common O="$GITHUB_WORKSPACE/out/android11-5.4" ARCH=arm64 qgki_defconfig
-          make -C common O="$GITHUB_WORKSPACE/out/android11-5.4" ARCH=arm64 oldconfig </dev/null
-          make -C common O="$GITHUB_WORKSPACE/out/android11-5.4" ARCH=arm64 modules_prepare
+
+          make -C common O="$GITHUB_WORKSPACE/out/android11-5.4" \
+            ARCH=arm64 CC=clang LD=ld.lld \
+            CROSS_COMPILE=aarch64-linux-android- \
+            CLANG_TRIPLE=aarch64-linux-gnu- oldconfig </dev/null
+
+          make -C common O="$GITHUB_WORKSPACE/out/android11-5.4" \
+            ARCH=arm64 CC=clang LD=ld.lld \
+            CROSS_COMPILE=aarch64-linux-android- \
+            CLANG_TRIPLE=aarch64-linux-gnu- modules_prepare
+
 
       - name: Compile RTL8188EUS
         run: |
